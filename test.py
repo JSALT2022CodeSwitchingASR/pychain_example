@@ -46,11 +46,13 @@ def main():
     with open(checkpoint_path, 'rb') as f:
         state = torch.load(f)
         model_args = state['args']
+        print("-----")
+        print(model_args)
         print("==> creating model '{}'".format(model_args.arch))
         model = get_model(model_args.feat_dim, model_args.num_targets,
                           model_args.layers, model_args.hidden_dims,
-                          model_args.arch, kernel_sizes=model_args.kernel_sizes,
-                          dilations=model_args.dilations,
+                          model_args.arch, model_args.activation, model_args.linear_dim,
+                          kernel_sizes=model_args.kernel_sizes, dilations=model_args.dilations,
                           strides=model_args.strides,
                           bidirectional=model_args.bidirectional,
                           dropout=model_args.dropout)

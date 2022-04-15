@@ -69,7 +69,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
 # Architecture
 parser.add_argument('--arch', '-a', metavar='ARCH', default='TDNN',
                     choices=['TDNN', 'RNN', 'LSTM',
-                             'GRU', 'TDNN-LSTM', 'TDNN-MFCC'],
+                             'GRU', 'TDNN-LSTM', 'TDNN-MFCC', 'FNET'],
                     help='model architecture: ')
 parser.add_argument('--layers', default=5, type=int, help='number of layers')
 parser.add_argument('--feat-dim', default=40, type=int,
@@ -88,6 +88,9 @@ parser.add_argument('--residual', default=False, type=bool,
                     help='residual connection in TDNN')
 parser.add_argument('--bidirectional', default=False, type=bool,
                     help='bidirectional rnn')
+# FNET parameters
+parser.add_argument('--activation', default=torch.nn.GELU, type=str, help='activation to add after the dense layer in the FNET architecture')
+parser.add_argument('--linear-dim', default=3072, type=int, help='dimension of the linear layers in fnet')
 # LF-MMI Loss
 parser.add_argument('--leaky', default=1e-5, type=float,
                     help='leaky hmm coefficient for the denominator')
@@ -130,6 +133,7 @@ def main():
     # Model
     print("==> creating model '{}'".format(args.arch))
     model = get_model(args.feat_dim, args.num_targets, args.layers, args.hidden_dims, args.arch,
+                      activation=args.activation, linear_fnet_dim=args.linear_dim,                      
                       kernel_sizes=args.kernel_sizes, dilations=args.dilations,
                       strides=args.strides,
                       bidirectional=args.bidirectional,

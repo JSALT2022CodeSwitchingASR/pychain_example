@@ -31,8 +31,8 @@ do_delta=false
 unit=phone # phone/char
 type=mono # mono/bi
 
-affix=
-stage=0
+affix=fnet
+stage=6
 . ./path.sh
 . ./utils/parse_options.sh
 
@@ -139,14 +139,16 @@ if [ ${stage} -le 5 ]; then
     --valid data/valid_${type}${unit}.json \
     --den-fst $graph/normalization.fst \
     --epochs 40 \
-    --train-bsz 64 \
-    --dropout 0.2 \
+    --arch FNET \
+    --train-bsz 32 \
+    --dropout 0.1 \
+    --linear-dim 1536 \
     --wd 0.01 \
     --optimizer adam \
     --lr 0.001 \
     --scheduler plateau \
     --gamma 0.5 \
-    --hidden-dims 384 384 384 384 384 \
+    --layers 6 \
     --curriculum 1 \
     --num-targets $num_targets \
     --seed 1 \
@@ -159,8 +161,9 @@ if [ ${stage} -le 6 ]; then
   result_file=$test_set/posteriors.ark
   mkdir -p $dir/$test_set
   python3 test.py \
-	  --test data/valid_${type}${unit}.json \
-	 --model model_best.pth.tar \
+	 --test data/valid_${type}${unit}.json \
+	 --bsz 16 \
+         --model model_best.pth.tar \
 	 --results $result_file \
 	 --exp $dir 2>&1 | tee $log_file
 fi
