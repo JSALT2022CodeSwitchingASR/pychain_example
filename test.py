@@ -51,11 +51,15 @@ def main():
         print("==> creating model '{}'".format(model_args.arch))
         model = get_model(model_args.feat_dim, model_args.num_targets,
                           model_args.layers, model_args.hidden_dims,
-                          model_args.arch, model_args.activation, model_args.linear_dim,
+                          model_args.arch, model_args.fnet_activation, model_args.fnet_num_layers,
+                          model_args.tdnn_out_dim, model_args.tdnn_num_layers,
                           kernel_sizes=model_args.kernel_sizes, dilations=model_args.dilations,
                           strides=model_args.strides,
                           bidirectional=model_args.bidirectional,
+                          nhead=model_args.nhead, num_trans_encoders=model_args.num_trans_encoders,
                           dropout=model_args.dropout)
+
+
         # residual=model_args.residual if model_args.residual else False)
         print(model)
 

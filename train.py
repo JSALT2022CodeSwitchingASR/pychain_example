@@ -69,7 +69,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
 # Architecture
 parser.add_argument('--arch', '-a', metavar='ARCH', default='TDNN',
                     choices=['TDNN', 'RNN', 'LSTM',
-                             'GRU', 'TDNN-LSTM', 'TDNN-MFCC', 'FNET'],
+                             'GRU', 'TDNN-LSTM', 'TDNN-MFCC', 'FNET', 'TDNN-FNET', 'TDNN_PE_FNET', 'TDNN_PE_TRANSFORMER'],
                     help='model architecture: ')
 parser.add_argument('--layers', default=5, type=int, help='number of layers')
 parser.add_argument('--feat-dim', default=40, type=int,
@@ -89,8 +89,14 @@ parser.add_argument('--residual', default=False, type=bool,
 parser.add_argument('--bidirectional', default=False, type=bool,
                     help='bidirectional rnn')
 # FNET parameters
-parser.add_argument('--activation', default=torch.nn.GELU, type=str, help='activation to add after the dense layer in the FNET architecture')
-parser.add_argument('--linear-dim', default=3072, type=int, help='dimension of the linear layers in fnet')
+parser.add_argument('--fnet-activation', default=torch.nn.GELU, type=str, help='activation to add after the dense layer in the FNET architecture')
+# TDNN-FNET parameters
+parser.add_argument('--tdnn-out-dim', default=100, type=int, help='output dim for the TDNN part in the TDNN-FNET architecture')
+parser.add_argument('--tdnn-num-layers', default=3, type=int, help='number of TDNN layers in the TDNN-FNET architecture')
+parser.add_argument('--fnet-num-layers', default=3, type=int, help='number of FNET blocks in the TDNN-FNET architecture')
+# TDNN-TRANSFORMER parameters
+parser.add_argument('--nhead', default=4, type=int, help='number of attention heads')
+parser.add_argument('--num-trans-encoders', default=2, type=int, help='number of encoders')
 # LF-MMI Loss
 parser.add_argument('--leaky', default=1e-5, type=float,
                     help='leaky hmm coefficient for the denominator')
@@ -133,12 +139,16 @@ def main():
     # Model
     print("==> creating model '{}'".format(args.arch))
     model = get_model(args.feat_dim, args.num_targets, args.layers, args.hidden_dims, args.arch,
-                      activation=args.activation, linear_fnet_dim=args.linear_dim,                      
+                      fnet_activation=args.fnet_activation,
+                      fnet_num_layers = args.fnet_num_layers,
+                      tdnn_out_dim = args.tdnn_out_dim, tdnn_num_layers = args.tdnn_num_layers,
                       kernel_sizes=args.kernel_sizes, dilations=args.dilations,
                       strides=args.strides,
                       bidirectional=args.bidirectional,
+                      nhead=args.nhead, num_trans_encoders=args.num_trans_encoders,
                       dropout=args.dropout,
                       residual=args.residual)
+
     print(model)
 
     if use_cuda:
